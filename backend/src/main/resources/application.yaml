@@ -27,3 +27,10 @@ management:
 
 server:
   port: ${PORT:8080}
+  servlet:
+    session:
+      timeout: 7d
+      cookie:
+        http-only: true
+        secure: true
+        same-site: lax
