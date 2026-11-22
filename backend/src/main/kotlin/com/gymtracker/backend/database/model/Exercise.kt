@@ -18,11 +18,19 @@ class Exercise(
 
     @ManyToMany
     @JoinTable(
-        name = "exercise_muscle_groups",
+        name = "exercise_primary_muscles",
         joinColumns = [JoinColumn(name = "exercise_id")],
         inverseJoinColumns = [JoinColumn(name = "muscle_group_id")]
     )
-    var muscleGroups: MutableSet<MuscleGroup> = mutableSetOf(),
+    var primaryMuscles: MutableSet<MuscleGroup> = mutableSetOf(),
+
+    @ManyToMany
+    @JoinTable(
+        name = "exercise_secondary_muscles",
+        joinColumns = [JoinColumn(name = "exercise_id")],
+        inverseJoinColumns = [JoinColumn(name = "muscle_group_id")]
+    )
+    var secondaryMuscles: MutableSet<MuscleGroup> = mutableSetOf(),
 
     @ManyToMany
     @JoinTable(
@@ -32,8 +40,25 @@ class Exercise(
     )
     var equipment: MutableSet<Equipment> = mutableSetOf(),
 
-    @Column(columnDefinition = "TEXT")
-    var imageUrl: String? = null,
+    @Enumerated(EnumType.STRING)
+    @Column(name = "mechanic")
+    var mechanic: ExerciseMechanic? = null,
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = true)
+    var category: ExerciseCategory? = null,
+
+    @OneToMany(
+        cascade = [CascadeType.ALL],
+        orphanRemoval = true
+    )
+    @JoinColumn(name = "exercise_id")
+    @OrderBy("position ASC")
+    var images: MutableList<ExerciseImage> = mutableListOf(),
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "level")
+    var level: ExerciseLevel? = null,
 
     @Column(columnDefinition = "TEXT")
     var gifUrl: String? = null,
