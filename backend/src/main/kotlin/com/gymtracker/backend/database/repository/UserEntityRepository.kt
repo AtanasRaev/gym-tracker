@@ -6,4 +6,10 @@ import org.springframework.stereotype.Repository
 import java.util.UUID
 
 @Repository
-interface UserEntityRepository : JpaRepository<UserEntity, UUID>
+interface UserEntityRepository : JpaRepository<UserEntity, UUID> {
+    fun findByEmail(email: String): UserEntity?
+
+    fun existsByEmail(email: String): Boolean
+
+    fun existsByUsername(username: String): Boolean
+}
