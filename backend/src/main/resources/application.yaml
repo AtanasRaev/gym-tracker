@@ -34,3 +34,5 @@ server:
         http-only: true
         secure: true
         same-site: lax
+gym-api:
+  url: "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main"

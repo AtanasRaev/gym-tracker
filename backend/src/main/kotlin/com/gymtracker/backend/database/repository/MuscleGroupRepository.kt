@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface MuscleGroupRepository : JpaRepository<MuscleGroup, Long> {
+    fun findFirstByNameIgnoreCase(name: String): MuscleGroup?
 }

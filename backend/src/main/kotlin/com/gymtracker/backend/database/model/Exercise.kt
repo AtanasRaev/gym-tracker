@@ -32,13 +32,13 @@ class Exercise(
     )
     var secondaryMuscles: MutableSet<MuscleGroup> = mutableSetOf(),
 
-    @ManyToMany
-    @JoinTable(
-        name = "exercise_equipment",
-        joinColumns = [JoinColumn(name = "exercise_id")],
-        inverseJoinColumns = [JoinColumn(name = "equipment_id")]
-    )
-    var equipment: MutableSet<Equipment> = mutableSetOf(),
+    @Enumerated(EnumType.STRING)
+    @Column(name = "equipment")
+    var equipment: ExerciseEquipment? = null,
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "force")
+    var force: ExerciseForce? = null,
 
     @Enumerated(EnumType.STRING)
     @Column(name = "mechanic")
