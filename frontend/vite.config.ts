@@ -8,6 +8,7 @@ export default defineConfig({
     // Forward API calls to the Spring backend so the browser sees one origin
     proxy: {
       '/api': 'http://localhost:8080',
+      '/auth': 'http://localhost:8080',
     },
   },
 })
