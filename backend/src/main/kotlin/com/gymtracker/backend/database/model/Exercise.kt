@@ -18,9 +18,6 @@ class Exercise(
     @Column(nullable = false)
     var name: String,
 
-    @Column(columnDefinition = "TEXT")
-    var description: String? = null,
-
     @ManyToMany
     @JoinTable(
         name = "exercise_primary_muscles",
@@ -64,9 +61,6 @@ class Exercise(
     @Enumerated(EnumType.STRING)
     @Column(name = "level")
     var level: ExerciseLevel? = null,
-
-    @Column(columnDefinition = "TEXT")
-    var gifUrl: String? = null,
 
     @Column(columnDefinition = "TEXT")
     var instructions: String? = null,

@@ -29,7 +29,7 @@ from overlapping.
 ## Migrations
 
 On an empty database, Flyway creates the base schema with V1 and then applies
-V2, V3 and V4 automatically at startup. No manual schema import is needed.
+V2, V3, V4 and V5 automatically at startup. No manual schema import is needed.
 Previously applied migrations must remain unchanged. Existing installations with
 the original schema but no Flyway history must be baselined at version 1 before
 running V2; a baseline records the version and does not create missing tables.
