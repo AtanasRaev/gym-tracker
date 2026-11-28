@@ -1,5 +1,6 @@
 package com.gymtracker.backend.database.model
 
+import com.gymtracker.backend.database.model.enums.Role
 import jakarta.persistence.CascadeType
 import jakarta.persistence.CollectionTable
 import jakarta.persistence.Column

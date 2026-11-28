@@ -11,6 +11,15 @@ spring:
     hibernate:
       ddl-auto: validate
     open-in-view: false
+    properties:
+      hibernate:
+        # Load muscles/images for a page of exercises in batches instead of one query per row
+        default_batch_fetch_size: 50
+
+  data:
+    web:
+      pageable:
+        max-page-size: 100
 
   flyway:
     enabled: true
@@ -34,3 +43,8 @@ server:
         http-only: true
         secure: true
         same-site: lax
+gym-api:
+  url: "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main"
+exercise-import:
+  # Seed the exercise catalog in the background on first start (when none is imported yet).
+  on-startup: true

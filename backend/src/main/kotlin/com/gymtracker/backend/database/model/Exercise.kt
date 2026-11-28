@@ -1,5 +1,10 @@
 package com.gymtracker.backend.database.model
 
+import com.gymtracker.backend.database.model.enums.ExerciseCategory
+import com.gymtracker.backend.database.model.enums.ExerciseEquipment
+import com.gymtracker.backend.database.model.enums.ExerciseForce
+import com.gymtracker.backend.database.model.enums.ExerciseLevel
+import com.gymtracker.backend.database.model.enums.ExerciseMechanic
 import jakarta.persistence.*
 
 
@@ -12,9 +17,6 @@ class Exercise(
 
     @Column(nullable = false)
     var name: String,
-
-    @Column(columnDefinition = "TEXT")
-    var description: String? = null,
 
     @ManyToMany
     @JoinTable(
@@ -32,13 +34,13 @@ class Exercise(
     )
     var secondaryMuscles: MutableSet<MuscleGroup> = mutableSetOf(),
 
-    @ManyToMany
-    @JoinTable(
-        name = "exercise_equipment",
-        joinColumns = [JoinColumn(name = "exercise_id")],
-        inverseJoinColumns = [JoinColumn(name = "equipment_id")]
-    )
-    var equipment: MutableSet<Equipment> = mutableSetOf(),
+    @Enumerated(EnumType.STRING)
+    @Column(name = "equipment")
+    var equipment: ExerciseEquipment? = null,
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "force")
+    var force: ExerciseForce? = null,
 
     @Enumerated(EnumType.STRING)
     @Column(name = "mechanic")
@@ -59,9 +61,6 @@ class Exercise(
     @Enumerated(EnumType.STRING)
     @Column(name = "level")
     var level: ExerciseLevel? = null,
-
-    @Column(columnDefinition = "TEXT")
-    var gifUrl: String? = null,
 
     @Column(columnDefinition = "TEXT")
     var instructions: String? = null,

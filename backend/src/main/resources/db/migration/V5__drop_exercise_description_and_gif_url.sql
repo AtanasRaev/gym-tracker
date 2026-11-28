@@ -1,0 +1,2 @@
+ALTER TABLE exercises DROP COLUMN IF EXISTS description;
+ALTER TABLE exercises DROP COLUMN IF EXISTS gif_url;

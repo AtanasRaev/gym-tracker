@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface ExerciseRepository : JpaRepository<Exercise, Long> {
+    fun findByExternalSourceAndExternalId(externalSource: String, externalId: String): Exercise?
+    fun existsByExternalSource(externalSource: String): Boolean
 }
