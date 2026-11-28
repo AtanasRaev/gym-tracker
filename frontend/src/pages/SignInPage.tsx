@@ -1,13 +1,9 @@
 import { useState, type FormEvent } from 'react'
-import { Navigate, useLocation, useNavigate } from 'react-router'
+import { Link, Navigate, useLocation, useNavigate } from 'react-router'
 import { ApiError } from '../api/auth'
 import { useAuth } from '../auth/AuthContext'
-
-/** Where to go after sign in: the page that sent the user here, or the home page. */
-function redirectTarget(state: unknown): string {
-  const from = (state as { from?: unknown } | null)?.from
-  return typeof from === 'string' && from.startsWith('/') ? from : '/'
-}
+import FormField from '../components/FormField'
+import { redirectTarget } from './redirectTarget'
 
 export default function SignInPage() {
   const { user, signIn } = useAuth()
@@ -25,6 +21,10 @@ export default function SignInPage() {
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setError(null)
+    if (!email.trim() || !password) {
+      setError('Enter your email and password.')
+      return
+    }
     setSubmitting(true)
     try {
       await signIn(email.trim(), password)
@@ -37,7 +37,7 @@ export default function SignInPage() {
 
   return (
     <main className="container auth-page">
-      <form className="auth-card" onSubmit={handleSubmit}>
+      <form className="auth-card" onSubmit={handleSubmit} noValidate>
         <h1>Sign in</h1>
 
         {error && (
@@ -46,33 +46,33 @@ export default function SignInPage() {
           </p>
         )}
 
-        <label className="field">
-          <span>Email</span>
-          <input
-            type="email"
-            name="email"
-            autoComplete="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </label>
-
-        <label className="field">
-          <span>Password</span>
-          <input
-            type="password"
-            name="password"
-            autoComplete="current-password"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </label>
+        <FormField
+          label="Email"
+          type="email"
+          name="email"
+          autoComplete="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        <FormField
+          label="Password"
+          type="password"
+          name="password"
+          autoComplete="current-password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
 
         <button type="submit" className="button button--primary" disabled={submitting}>
           {submitting ? 'Signing in…' : 'Sign in'}
         </button>
+
+        <p className="auth-switch">
+          Don't have an account?{' '}
+          <Link to="/sign-up" state={location.state}>
+            Sign up
+          </Link>
+        </p>
       </form>
     </main>
   )

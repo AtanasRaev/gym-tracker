@@ -3,6 +3,7 @@ import AuthProvider from './auth/AuthProvider'
 import Layout from './components/Layout'
 import ExercisesPage from './pages/ExercisesPage'
 import SignInPage from './pages/SignInPage'
+import SignUpPage from './pages/SignUpPage'
 
 export default function App() {
   return (
@@ -12,6 +13,7 @@ export default function App() {
           <Route element={<Layout />}>
             <Route index element={<ExercisesPage />} />
             <Route path="sign-in" element={<SignInPage />} />
+            <Route path="sign-up" element={<SignUpPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </Routes>

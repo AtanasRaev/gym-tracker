@@ -291,6 +291,41 @@ body {
   border-color: transparent;
 }
 
+.field--invalid input {
+  border-color: var(--error);
+}
+
+.field-error {
+  color: var(--error);
+  font-size: 0.8125rem;
+}
+
+.field-hint {
+  color: var(--muted);
+  font-size: 0.8125rem;
+}
+
+/* Two fields side by side; stacked on narrow screens */
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+@media (max-width: 420px) {
+  .field-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.field-row .field {
+  min-width: 0;
+}
+
+.button--small {
+  padding: 6px 12px;
+}
+
 .form-error {
   margin: 0;
   padding: 10px 12px;
