@@ -1,5 +1,10 @@
 package com.gymtracker.backend.database.model
 
+import com.gymtracker.backend.database.model.enums.ExerciseCategory
+import com.gymtracker.backend.database.model.enums.ExerciseEquipment
+import com.gymtracker.backend.database.model.enums.ExerciseForce
+import com.gymtracker.backend.database.model.enums.ExerciseLevel
+import com.gymtracker.backend.database.model.enums.ExerciseMechanic
 import jakarta.persistence.*
 
 

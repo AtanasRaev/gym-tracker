@@ -15,17 +15,10 @@ class ExerciseImageUploader(private val environment: Environment) {
         ))
     }
 
+    // Upload API only: the Admin API (e.g. api().resource) is rate-limited to ~500
+    // calls/hour on the Free plan. With overwrite=false, uploading to an existing
+    // public ID returns the existing asset instead of replacing it.
     fun upload(url: String, publicId: String): String {
-        val existing = try {
-            client.api().resource(publicId, emptyMap<String, Any>())
-        } catch (e: com.cloudinary.api.exceptions.NotFound) {
-            null
-        }
-        if (existing != null) {
-            val existingUrl = existing["secure_url"] as? String
-            require(existing["public_id"] == publicId && existingUrl?.startsWith("https://") == true)
-            return existingUrl
-        }
         val result = client.uploader().upload(url, mapOf(
             "public_id" to publicId, "overwrite" to false,
             "unique_filename" to false, "resource_type" to "image"

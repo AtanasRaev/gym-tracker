@@ -1,6 +1,11 @@
 package com.gymtracker.backend.service.impl
 
 import com.gymtracker.backend.database.model.*
+import com.gymtracker.backend.database.model.enums.ExerciseCategory
+import com.gymtracker.backend.database.model.enums.ExerciseEquipment
+import com.gymtracker.backend.database.model.enums.ExerciseForce
+import com.gymtracker.backend.database.model.enums.ExerciseLevel
+import com.gymtracker.backend.database.model.enums.ExerciseMechanic
 import com.gymtracker.backend.database.repository.*
 import com.gymtracker.backend.service.api.dto.ExternalExerciseDto
 import org.springframework.stereotype.Service
@@ -13,8 +18,8 @@ class ExerciseImportPersistence(
 ) {
     @Transactional
     fun save(dto: ExternalExerciseDto): Long {
-        val exercise = exercises.findByExternalSourceAndExternalId("free-exercise-db", dto.id)
-            ?: Exercise(name = dto.name, externalId = dto.id, externalSource = "free-exercise-db")
+        val exercise = exercises.findByExternalSourceAndExternalId(ExerciseImportService.EXTERNAL_SOURCE, dto.id)
+            ?: Exercise(name = dto.name, externalId = dto.id, externalSource = ExerciseImportService.EXTERNAL_SOURCE)
         exercise.name = dto.name
         exercise.instructions = dto.instructions.joinToString("\n")
         exercise.level = ExerciseLevel.valueOf(dto.level.uppercase())

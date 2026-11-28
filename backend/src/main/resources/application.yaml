@@ -36,3 +36,6 @@ server:
         same-site: lax
 gym-api:
   url: "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main"
+exercise-import:
+  # Seed the exercise catalog in the background on first start (when none is imported yet).
+  on-startup: true

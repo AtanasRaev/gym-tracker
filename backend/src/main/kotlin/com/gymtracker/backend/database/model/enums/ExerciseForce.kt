@@ -1,4 +1,4 @@
-package com.gymtracker.backend.database.model
+package com.gymtracker.backend.database.model.enums
 
 enum class ExerciseForce {
     PUSH,

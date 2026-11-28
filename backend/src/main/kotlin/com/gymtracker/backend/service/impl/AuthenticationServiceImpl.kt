@@ -1,7 +1,7 @@
 package com.gymtracker.backend.service.impl
 
 import com.gymtracker.backend.database.dto.UserResponseDto
-import com.gymtracker.backend.database.model.Role
+import com.gymtracker.backend.database.model.enums.Role
 import com.gymtracker.backend.database.model.UserEntity
 import com.gymtracker.backend.database.repository.UserEntityRepository
 import com.gymtracker.backend.service.AuthenticationService

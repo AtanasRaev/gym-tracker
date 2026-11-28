@@ -2,16 +2,32 @@
 
 Set DB_URL, DB_USERNAME, DB_PASSWORD, CLOUDINARY_CLOUD_NAME,
 CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET in the process environment.
+
+## Automatic seeding on startup
+
+When the server is ready and no free-exercise-db exercises exist yet, it runs
+the import on a background thread. Startup is not blocked, and a failed import
+only logs; the server keeps running. Disable with
+`--exercise-import.on-startup=false`. Seeding runs only once: after a partial
+import, use the command below to fill in what is missing.
+
+## One-off command
+
 After building the boot JAR, run:
 
 ```sh
 java -jar build/libs/backend-0.0.1-SNAPSHOT.jar --exercise-import.enabled=true --server.port=0
 ```
 
-Normal startup does not import. The command exits with 0 on success, 2 on
-partial failure, and 1 on fatal failure or concurrent execution. A PostgreSQL
-session advisory lock coordinates instances. Re-run the command to retry missing
-images; deterministic public IDs and overwrite=false prevent duplicate assets.
+The command exits with 0 on success, 2 on partial failure, and 1 on fatal
+failure or concurrent execution. The import is idempotent: re-running updates
+existing exercises and only uploads missing images; deterministic public IDs and
+overwrite=false prevent duplicate assets. A PostgreSQL session advisory lock
+keeps concurrent imports (several instances, or the seeder and the command)
+from overlapping.
+
+## Migrations
+
 On an empty database, Flyway creates the base schema with V1 and then applies
 V2, V3 and V4 automatically at startup. No manual schema import is needed.
 Previously applied migrations must remain unchanged. Existing installations with
