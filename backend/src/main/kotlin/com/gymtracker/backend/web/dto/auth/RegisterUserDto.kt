@@ -16,7 +16,9 @@ data class RegisterUserDto(
     @field:NotBlank(message = "Password cannot be empty")
     @field:Size(
         min = 8,
-        message = "Password must be at least 8 characters"
+        // BCrypt only uses the first 72 bytes and Spring Security rejects longer input
+        max = 72,
+        message = "Password must be between 8 and 72 characters"
     )
     val password: String,
 

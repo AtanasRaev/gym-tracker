@@ -1,14 +1,18 @@
 package com.gymtracker.backend.service.impl
 
 import com.gymtracker.backend.database.dto.UserResponseDto
-import com.gymtracker.backend.database.model.enums.Role
+import com.gymtracker.backend.database.dto.toResponseDto
 import com.gymtracker.backend.database.model.UserEntity
+import com.gymtracker.backend.database.model.enums.Role
 import com.gymtracker.backend.database.repository.UserEntityRepository
 import com.gymtracker.backend.service.AuthenticationService
+import com.gymtracker.backend.service.normalizeEmail
 import com.gymtracker.backend.web.dto.auth.RegisterUserDto
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.HttpStatus
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
 
 @Service
@@ -17,42 +21,64 @@ class AuthenticationServiceImpl(
     private val passwordEncoder: PasswordEncoder
 ) : AuthenticationService {
 
+    @Transactional
     override fun register(registerUserDto: RegisterUserDto): UserResponseDto {
-        if (userEntityRepository.existsByEmail(registerUserDto.email)) {
-            throw ResponseStatusException(
-                HttpStatus.CONFLICT,
-                "Email already registered"
-            )
+        // The DTO limits characters; BCrypt limits UTF-8 bytes
+        if (registerUserDto.password.toByteArray(Charsets.UTF_8).size > MAX_PASSWORD_BYTES) {
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Password is too long")
         }
 
-        if (userEntityRepository.existsByUsername(registerUserDto.username)) {
-            throw ResponseStatusException(
-                HttpStatus.CONFLICT,
-                "Username already taken"
-            )
+        val email = normalizeEmail(registerUserDto.email)
+        val username = registerUserDto.username.trim()
+
+        userEntityRepository.lockForRegistration(REGISTRATION_LOCK_KEY)
+
+        if (userEntityRepository.existsByEmailIgnoreCase(email)) {
+            throw ResponseStatusException(HttpStatus.CONFLICT, "Email already registered")
+        }
+
+        if (userEntityRepository.existsByUsername(username)) {
+            throw ResponseStatusException(HttpStatus.CONFLICT, "Username already taken")
         }
 
         val encodedPassword = passwordEncoder.encode(registerUserDto.password)
             ?: throw IllegalStateException("Password encoding failed")
 
+        // The first account becomes the admin. Admins store every role explicitly.
+        val roles = if (userEntityRepository.count() == 0L) {
+            Role.entries.toMutableSet()
+        } else {
+            mutableSetOf(Role.USER)
+        }
+
         val user = UserEntity(
-            username = registerUserDto.username,
-            email = registerUserDto.email,
+            username = username,
+            email = email,
             password = encodedPassword,
-            firstName = registerUserDto.firstName,
-            lastName = registerUserDto.lastName,
-            roles = mutableSetOf(Role.USER)
+            firstName = registerUserDto.firstName?.trim()?.ifEmpty { null },
+            lastName = registerUserDto.lastName?.trim()?.ifEmpty { null },
+            roles = roles
         )
 
-        userEntityRepository.save(user)
+        try {
+            userEntityRepository.saveAndFlush(user)
+        } catch (e: DataIntegrityViolationException) {
+            // Safety net if a row was written outside this lock (for example, by hand)
+            throw ResponseStatusException(HttpStatus.CONFLICT, "Email or username already in use", e)
+        }
 
-        return UserResponseDto(
-            id = user.id,
-            username = user.username,
-            email = user.email,
-            firstName = user.firstName,
-            lastName = user.lastName,
-            roles = user.roles.map { it.name }
-        )
+        return user.toResponseDto()
+    }
+
+    @Transactional(readOnly = true)
+    override fun getByEmail(email: String): UserResponseDto =
+        userEntityRepository.findByEmailIgnoreCase(normalizeEmail(email))?.toResponseDto()
+            ?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED)
+
+    private companion object {
+        const val MAX_PASSWORD_BYTES = 72
+
+        // Arbitrary constant that identifies the registration lock in pg_advisory_xact_lock
+        const val REGISTRATION_LOCK_KEY = 4_815_162_342L
     }
 }
