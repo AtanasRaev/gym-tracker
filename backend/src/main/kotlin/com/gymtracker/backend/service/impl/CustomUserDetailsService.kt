@@ -1,6 +1,7 @@
 package com.gymtracker.backend.service.impl
 
 import com.gymtracker.backend.database.repository.UserEntityRepository
+import com.gymtracker.backend.service.normalizeEmail
 import org.springframework.security.core.userdetails.User
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
@@ -13,7 +14,7 @@ class CustomUserDetailsService(
 ) : UserDetailsService {
 
     override fun loadUserByUsername(username: String): UserDetails {
-        val user = userEntityRepository.findByEmail(username)
+        val user = userEntityRepository.findByEmailIgnoreCase(normalizeEmail(username))
             ?: throw UsernameNotFoundException("User not found")
 
         return User.builder()
