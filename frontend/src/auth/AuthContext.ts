@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react'
-import type { User } from '../api/auth'
+import type { SignUpData, User } from '../api/auth'
 
 export interface AuthState {
   /** The signed-in user, or null when signed out. */
@@ -7,6 +7,7 @@ export interface AuthState {
   /** True until the first /auth/me call finishes. */
   loading: boolean
   signIn: (email: string, password: string) => Promise<User>
+  signUp: (data: SignUpData) => Promise<User>
   signOut: () => Promise<void>
 }
 

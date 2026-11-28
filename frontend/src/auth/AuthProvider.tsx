@@ -21,14 +21,20 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     return signedIn
   }, [])
 
+  const signUp = useCallback(async (data: authApi.SignUpData) => {
+    const signedUp = await authApi.signUp(data)
+    setUser(signedUp)
+    return signedUp
+  }, [])
+
   const signOut = useCallback(async () => {
     await authApi.signOut()
     setUser(null)
   }, [])
 
   const value = useMemo<AuthState>(
-    () => ({ user, loading, signIn, signOut }),
-    [user, loading, signIn, signOut],
+    () => ({ user, loading, signIn, signUp, signOut }),
+    [user, loading, signIn, signUp, signOut],
   )
 
   return <AuthContext value={value}>{children}</AuthContext>
