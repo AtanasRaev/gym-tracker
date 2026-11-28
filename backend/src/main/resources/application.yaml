@@ -41,7 +41,8 @@ server:
       timeout: 7d
       cookie:
         http-only: true
-        secure: true
+        # Set SESSION_COOKIE_SECURE=false only when the app is served over plain HTTP
+        secure: ${SESSION_COOKIE_SECURE:true}
         same-site: lax
 gym-api:
   url: "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main"

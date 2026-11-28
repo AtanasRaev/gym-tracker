@@ -43,8 +43,12 @@ Before the first start, check the port is free: `sudo ss -lntp 'sport = :3004'`.
 - **Tailscale Serve:** `sudo tailscale serve --bg --https=<port> http://127.0.0.1:3004`.
   Pick a port that doesn't replace an existing route (`sudo tailscale serve status`).
   It serves HTTPS, so login works.
-
-Plain `http://<server-ip>` won't work for login: the session cookie is HTTPS-only.
+- **Plain HTTP on your network** (for example `http://home.pi.home.arpa` or
+  `http://<server-ip>`): Chrome and other browsers do not send a `secure` cookie over
+  plain HTTP, so sign in and sign up fail with `403`. To allow it, set
+  `SESSION_COOKIE_SECURE=false` in `.env` and run `docker compose up -d`. Anyone who
+  can watch your network traffic can then copy a session cookie, so use this only on a
+  network you trust.
 
 ## Day to day
 
