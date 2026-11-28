@@ -42,9 +42,14 @@ export default function Layout() {
                   </button>
                 </>
               ) : (
-                <Link to="/sign-in" className="button button--ghost">
-                  Sign in
-                </Link>
+                <>
+                  <Link to="/sign-in" className="button button--ghost">
+                    Sign in
+                  </Link>
+                  <Link to="/sign-up" className="button button--primary button--small">
+                    Sign up
+                  </Link>
+                </>
               )}
             </div>
           )}

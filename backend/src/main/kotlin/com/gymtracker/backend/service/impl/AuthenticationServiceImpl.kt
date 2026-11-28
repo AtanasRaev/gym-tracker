@@ -5,6 +5,7 @@ import com.gymtracker.backend.database.dto.toResponseDto
 import com.gymtracker.backend.database.model.UserEntity
 import com.gymtracker.backend.database.model.enums.Role
 import com.gymtracker.backend.database.repository.UserEntityRepository
+import com.gymtracker.backend.exception.FieldException
 import com.gymtracker.backend.service.AuthenticationService
 import com.gymtracker.backend.service.normalizeEmail
 import com.gymtracker.backend.web.dto.auth.RegisterUserDto
@@ -25,7 +26,7 @@ class AuthenticationServiceImpl(
     override fun register(registerUserDto: RegisterUserDto): UserResponseDto {
         // The DTO limits characters; BCrypt limits UTF-8 bytes
         if (registerUserDto.password.toByteArray(Charsets.UTF_8).size > MAX_PASSWORD_BYTES) {
-            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Password is too long")
+            throw FieldException(HttpStatus.BAD_REQUEST, "password", "Password is too long")
         }
 
         val email = normalizeEmail(registerUserDto.email)
@@ -34,11 +35,11 @@ class AuthenticationServiceImpl(
         userEntityRepository.lockForRegistration(REGISTRATION_LOCK_KEY)
 
         if (userEntityRepository.existsByEmailIgnoreCase(email)) {
-            throw ResponseStatusException(HttpStatus.CONFLICT, "Email already registered")
+            throw FieldException(HttpStatus.CONFLICT, "email", "Email already registered")
         }
 
         if (userEntityRepository.existsByUsername(username)) {
-            throw ResponseStatusException(HttpStatus.CONFLICT, "Username already taken")
+            throw FieldException(HttpStatus.CONFLICT, "username", "Username already taken")
         }
 
         val encodedPassword = passwordEncoder.encode(registerUserDto.password)

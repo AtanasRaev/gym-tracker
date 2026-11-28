@@ -7,13 +7,39 @@ export interface User {
   roles: string[]
 }
 
+export interface SignUpData {
+  username: string
+  email: string
+  password: string
+  firstName?: string
+  lastName?: string
+}
+
+/** Field name to message, for example `{ email: 'Email already registered' }`. */
+export type FieldErrors = Partial<Record<string, string>>
+
 /** An HTTP error from the backend. `message` is safe to show to the user. */
 export class ApiError extends Error {
   readonly status: number
+  readonly fieldErrors: FieldErrors
 
-  constructor(status: number, message: string) {
+  constructor(status: number, message: string, fieldErrors: FieldErrors = {}) {
     super(message)
     this.status = status
+    this.fieldErrors = fieldErrors
+  }
+}
+
+/** Reads the backend's problem details JSON (`detail`, `fieldErrors`). */
+async function toApiError(response: Response, fallback: string): Promise<ApiError> {
+  try {
+    const body: { detail?: unknown; fieldErrors?: unknown } = await response.json()
+    const message = typeof body.detail === 'string' ? body.detail : fallback
+    const fieldErrors =
+      body.fieldErrors && typeof body.fieldErrors === 'object' ? (body.fieldErrors as FieldErrors) : {}
+    return new ApiError(response.status, message, fieldErrors)
+  } catch {
+    return new ApiError(response.status, fallback)
   }
 }
 
@@ -74,6 +100,18 @@ export async function signIn(email: string, password: string): Promise<User> {
   })
   if (response.status === 401) throw new ApiError(401, 'Wrong email or password.')
   if (!response.ok) throw new ApiError(response.status, 'Sign in failed. Try again.')
+  resetCsrfToken()
+  return response.json()
+}
+
+/** Creates the account. The backend also signs the new user in. */
+export async function signUp(data: SignUpData): Promise<User> {
+  const response = await sendWithCsrf('/auth/register', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  })
+  if (!response.ok) throw await toApiError(response, 'Sign up failed. Try again.')
   resetCsrfToken()
   return response.json()
 }
